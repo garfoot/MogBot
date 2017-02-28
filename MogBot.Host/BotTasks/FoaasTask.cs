@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Discord;
 using Discord.Commands;
 using FeatureSwitcher;
 using MogBot.Host.Features;
@@ -15,38 +14,35 @@ using Refit;
 
 namespace MogBot.Host.BotTasks
 {
-    public class FoaasTask
+    public class FoaasTask : TaskBase
     {
+        protected override bool IsEnabledFeature => Feature<EnableFoaas>.Is().Enabled;
+
+        public override string Name => "FOAAS";
+
         public FoaasTask()
         {
             _foaasOperations = new AsyncLazy<IList<FoaasOperation>>(() => LoadFoaasCommands());
         }
 
-        public Task Init(HostingEnvironment env)
+        protected override Task InitCore()
         {
-            _env = env;
-
-            _env.Trace.Write("FOAAS task is ", ConsoleColor.White);
-
-            if (Feature<EnableFoaas>.Is().Disabled)
-            {
-                _env.Trace.WriteLine("disabled", ConsoleColor.Yellow);
-                return Task.FromResult(0);
-            }
-
-            _env.Trace.WriteLine("enabled", ConsoleColor.Green);
-
-
-            _env.Discord.GetService<CommandService>()
-                   .CreateCommand("fo")
-                   .Parameter("PersonOrThing", ParameterType.Required)
-                   .Do(Foaas);
+            Env.Discord.GetService<CommandService>()
+                .CreateCommand("fo")
+                .Parameter("PersonOrThing", ParameterType.Required)
+                .Do(Foaas);
 
             return Task.FromResult(0);
         }
 
         private async Task Foaas(CommandEventArgs arg)
         {
+            if (!Env.IsAdultOnly(arg.Channel))
+            {
+                await arg.Channel.SendMessage($"I'm sorry {arg.User.Name}, I'm afraid I can't do that here.");
+                return;
+            }
+
             string message = await GetFoaasMessage(arg.Args[0], arg.User.Name);
             await arg.Channel.SendMessage($"{message} - {arg.User.Name}");
         }
@@ -58,7 +54,8 @@ namespace MogBot.Host.BotTasks
             int item = random.Next(0, foaasOperations.Count);
 
             FoaasOperation operation = foaasOperations[item];
-            Console.WriteLine($"Chose {operation.Name}");
+
+            Env.Trace.WriteLine($"FOAAS: Chose {operation.Name}", ConsoleColor.Gray);
 
             string url = operation.Url.UriRelative()
                                   .WithHost("foaas.com")
@@ -95,6 +92,5 @@ namespace MogBot.Host.BotTasks
         }
 
         private readonly AsyncLazy<IList<FoaasOperation>> _foaasOperations;
-        private HostingEnvironment _env;
     }
 }

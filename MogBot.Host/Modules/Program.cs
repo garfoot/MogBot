@@ -3,16 +3,15 @@ using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
 using FeatureSwitcher;
-using FeatureSwitcher.Configuration;
 using Microsoft.Azure.WebJobs;
 using MogBot.Host.Extensions;
 using MogBot.Host.Features;
 using MogBot.Host.Settings;
 using Nito.AsyncEx;
 
-
-namespace MogBot.Host
+namespace MogBot.Host.Modules
 {
     internal class Program : IDisposable
     {
@@ -46,6 +45,7 @@ namespace MogBot.Host
         private async Task Run()
         {
             FeatureSwitcher.Configuration.Features.Are.ConfiguredBy.AppConfig().NamedBy.Attribute();
+            ConfigureContainer();
 
             string webJobId = Environment.GetEnvironmentVariable("WEBJOBS_RUN_ID");
             Action<Task> blockUntilComplete;
@@ -67,19 +67,27 @@ namespace MogBot.Host
             await RunCore(blockUntilComplete);
         }
 
+        private void ConfigureContainer()
+        {
+            var builder = new ContainerBuilder();
+            builder.RegisterModule<CoreModule>();
+            IContainer container = builder.Build();
+            _scope = container.BeginLifetimeScope();
+            _disposer.Add(container);
+            _disposer.Add(_scope);
+        }
+
         private async Task RunCore(Action<Task> blockUntilComplete)
         {
             if (Feature<MogBotEnabled>.Is().Enabled)
             {
                 ConsoleExtensions.WriteLine("Running MogBot", ConsoleColor.Green);
-                using (var mogBot = new MogBot(new AppSettingsProvider()))
-                {
-                    Task completionTask = await mogBot.Start(CancellationToken.None);
+                var mogBot = _scope.Resolve<MogBot>();
+                Task completionTask = await mogBot.Start(CancellationToken.None);
 
-                    blockUntilComplete(completionTask);
+                blockUntilComplete(completionTask);
 
-                    await mogBot.Stop();
-                }
+                await mogBot.Stop();
             }
             else
             {
@@ -90,5 +98,6 @@ namespace MogBot.Host
 
 
         private readonly CompositeDisposable _disposer = new CompositeDisposable();
+        private ILifetimeScope _scope;
     }
 }
