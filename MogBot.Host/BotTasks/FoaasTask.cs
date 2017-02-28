@@ -22,14 +22,22 @@ namespace MogBot.Host.BotTasks
             _foaasOperations = new AsyncLazy<IList<FoaasOperation>>(() => LoadFoaasCommands());
         }
 
-        public Task Init(DiscordClient discord)
+        public Task Init(HostingEnvironment env)
         {
+            _env = env;
+
+            _env.Trace.Write("FOAAS task is ", ConsoleColor.White);
+
             if (Feature<EnableFoaas>.Is().Disabled)
             {
+                _env.Trace.WriteLine("disabled", ConsoleColor.Yellow);
                 return Task.FromResult(0);
             }
 
-            discord.GetService<CommandService>()
+            _env.Trace.WriteLine("enabled", ConsoleColor.Green);
+
+
+            _env.Discord.GetService<CommandService>()
                    .CreateCommand("fo")
                    .Parameter("PersonOrThing", ParameterType.Required)
                    .Do(Foaas);
@@ -87,5 +95,6 @@ namespace MogBot.Host.BotTasks
         }
 
         private readonly AsyncLazy<IList<FoaasOperation>> _foaasOperations;
+        private HostingEnvironment _env;
     }
 }

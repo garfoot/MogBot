@@ -3,8 +3,10 @@ using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
+using FeatureSwitcher;
 using FeatureSwitcher.Configuration;
 using Microsoft.Azure.WebJobs;
+using MogBot.Host.Extensions;
 using MogBot.Host.Features;
 using MogBot.Host.Settings;
 using Nito.AsyncEx;
@@ -67,13 +69,22 @@ namespace MogBot.Host
 
         private async Task RunCore(Action<Task> blockUntilComplete)
         {
-            using (var mogBot = new MogBot(new AppSettingsProvider()))
+            if (Feature<MogBotEnabled>.Is().Enabled)
             {
-                Task completionTask = await mogBot.Start(CancellationToken.None);
+                ConsoleExtensions.WriteLine("Running MogBot", ConsoleColor.Green);
+                using (var mogBot = new MogBot(new AppSettingsProvider()))
+                {
+                    Task completionTask = await mogBot.Start(CancellationToken.None);
 
-                blockUntilComplete(completionTask);
+                    blockUntilComplete(completionTask);
 
-                await mogBot.Stop();
+                    await mogBot.Stop();
+                }
+            }
+            else
+            {
+                ConsoleExtensions.WriteLine("MogBot is NOT enabled.", ConsoleColor.Yellow);
+                blockUntilComplete(new TaskCompletionSource().Task);
             }
         }
 

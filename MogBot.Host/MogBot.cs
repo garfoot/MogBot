@@ -4,7 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using FeatureSwitcher;
 using MogBot.Host.BotTasks;
+using MogBot.Host.Features;
 using MogBot.Host.Settings;
 using Nito.AsyncEx;
 
@@ -44,7 +46,7 @@ namespace MogBot.Host
             });
 
             var foaasTask = new FoaasTask();
-            await foaasTask.Init(_discord);
+            await foaasTask.Init(new HostingEnvironment(_discord, new ConsoleTrace()));
 
             await _discord.Connect(_settings.GetSetting(DefinedSettings.BotToken), TokenType.Bot);
 
