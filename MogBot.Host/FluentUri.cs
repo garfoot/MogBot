@@ -163,7 +163,7 @@ namespace MogBot.Host
                 // Regex for full URI
                 var regex =
                     new Regex(
-                        "(?\'scheme\'[^:]+)(?::\\/\\/)(?\'host\'[^:\\/]+)(?::(?\'port\'\\d+))?(?:\\/)?(?\'path\'[^?#]+)(?:\\/)?(?\'query\'[^#]+)?(?\'fragment\'#.+)?");
+                        "(?\'scheme\'[^:]+)(?::\\/\\/)(?\'host\'[^:\\/]+)(?::(?\'port\'\\d+))?(?:\\/)?(?\'path\'[^?#]+)?(?:\\/)?(?\'query\'[^#]+)?(?\'fragment\'#.+)?");
                 Match match = regex.Match(uri);
 
                 if (!match.Success)
