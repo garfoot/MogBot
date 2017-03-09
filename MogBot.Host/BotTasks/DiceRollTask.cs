@@ -4,18 +4,23 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Commands;
+using FeatureSwitcher;
 using MogBot.Host.Extensions;
+using MogBot.Host.Features;
 
 namespace MogBot.Host.BotTasks
 {
     public class DiceRollTask : TaskBase
     {
+        protected override bool IsEnabledFeature => Feature<EnableDiceRoll>.Is().Enabled;
         public override string Name => "DiceRoll";
         protected override Task InitCore()
         {
             Env.Discord.GetService<CommandService>()
                 .CreateCommand("roll")
+                .Alias("r")
                 .Parameter("diceSpec", ParameterType.Multiple)
+                .Description("Roll some dice. Spec as a space separated list of dice. Eg. 2d6+1 4d4 would roll 2xd6 and add 1 along with 4xd4 and total them.")
                 .Do(Roll);
 
             return Task.FromResult(0);
@@ -76,12 +81,19 @@ namespace MogBot.Host.BotTasks
                     mod = $"{i.Value.Mod:+#;-#;0}";
                 }
 
-                return $"{i.Value.Spec} ({string.Join(", ", i.Value.Nums)}){mod} = {i.Value.Total}";
+                return $"{i.Value.Spec} (**{string.Join(", ", i.Value.Nums)}**){mod} = ***{i.Value.Total}***";
             });
 
             var total = nums.Aggregate(0, (c, i) => c + i.Value.Total);
 
-            args.Channel.SendMessage($"{args.User.Name} rolled {string.Join(", ", diceRolls)} for a total of {total}");
+            string totalMessage = null;
+            if (nums.Count > 1)
+            {
+                totalMessage = $" for a total of ***{total}***";
+            }
+
+            var name = args.User.NicknameMention ?? args.User.Nickname ?? args.User.Name;
+            args.Channel.SendMessage($"{name} rolled {string.Join(", ", diceRolls)}{totalMessage}");
 
             return Task.FromResult(0);
         }

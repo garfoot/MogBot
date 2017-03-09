@@ -195,6 +195,7 @@
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="DefinedSettings.cs" />
     <Compile Include="Extensions\ConsoleExtensions.cs" />
+    <Compile Include="Features\EnableDiceRoll.cs" />
     <Compile Include="Features\EnableFoaas.cs" />
     <Compile Include="Features\EnableGoon.cs" />
     <Compile Include="Features\FeatureExtensions.cs" />
