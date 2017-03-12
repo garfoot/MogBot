@@ -45,7 +45,7 @@ namespace MogBot.Host.BotTasks
                     var current = new List<int>();
                     for (int i = 0; i < mul; i++)
                     {
-                        current.Add(random.Next(1, num));
+                        current.Add(random.Next(1, num + 1));
                     }
 
                     int? mod = null;
