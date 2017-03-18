@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using DotNetOpenAuth.Messaging;
 using FluentValidation;
 using FluentValidation.Results;
 using MogBot.Host.Extensions;

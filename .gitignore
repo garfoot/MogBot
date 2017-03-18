@@ -238,9 +238,8 @@ _Pvt_Extensions
 GeneratedArtifacts/
 ModelManifest.xml
 
-# Paket dependency manager
-.paket/paket.exe
-
 # FAKE - F# Make
 .fake/
+
+# Local config settings
 /MogBot.Host/App_Config/Local.config
