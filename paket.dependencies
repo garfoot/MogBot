@@ -7,6 +7,7 @@ nuget Autofac ~> 4
 nuget Discord.Net.Commands ~> 0
 nuget FeatureSwitcher ~> 1
 nuget FluentValidation ~> 6
+nuget Microsoft.ApplicationInsights ~> 2
 nuget Microsoft.Azure.WebJobs ~> 1
 nuget Microsoft.Net.Http ~> 2
 nuget Microsoft.Web.WebJobs.Publish ~> 1

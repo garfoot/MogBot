@@ -13,6 +13,7 @@ NUGET
       Discord.Net (>= 0.9.6)
     FeatureSwitcher (1.1)
     FluentValidation (6.2.1)
+    Microsoft.ApplicationInsights (2.2)
     Microsoft.Azure.KeyVault.Core (2.0.4)
     Microsoft.Azure.WebJobs (1.1.2)
       Microsoft.Azure.WebJobs.Core (1.1.2)

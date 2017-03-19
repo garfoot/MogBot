@@ -2,6 +2,7 @@ Autofac
 Discord.Net.Commands
 FeatureSwitcher
 FluentValidation
+Microsoft.ApplicationInsights
 Microsoft.Azure.WebJobs
 Microsoft.Net.Http
 Microsoft.Web.WebJobs.Publish
