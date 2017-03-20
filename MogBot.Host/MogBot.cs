@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using MogBot.Host.BotTasks;
+using MogBot.Host.Extensions;
 using MogBot.Host.Settings;
 using Nito.AsyncEx;
 
@@ -43,6 +45,24 @@ namespace MogBot.Host
         {
             _discord = new DiscordClient();
             _disposer.Add(_discord);
+
+            _disposer.Add(Observable
+                .FromEventPattern<LogMessageEventArgs>(
+                    h => _discord.Log.Message += h,
+                    h => _discord.Log.Message -= h)
+                .Select(i => i.EventArgs)
+                .Subscribe(i =>
+                {
+                    ConsoleExtensions.Write(i.Severity.ToString().ToUpperInvariant(),
+                        i.Severity == LogSeverity.Error
+                            ? ConsoleColor.Red
+                            : i.Severity == LogSeverity.Warning
+                                ? ConsoleColor.Yellow
+                                : ConsoleColor.Gray);
+
+                    Console.WriteLine($" : {i.Message}");
+                }));
+
 
             _discord.UsingCommands(i =>
             {

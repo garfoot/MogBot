@@ -8,10 +8,10 @@ using FeatureSwitcher;
 using Microsoft.Azure.WebJobs;
 using MogBot.Host.Extensions;
 using MogBot.Host.Features;
-using MogBot.Host.Settings;
+using MogBot.Host.Modules;
 using Nito.AsyncEx;
 
-namespace MogBot.Host.Modules
+namespace MogBot.Host
 {
     internal class Program : IDisposable
     {

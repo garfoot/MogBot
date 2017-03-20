@@ -8,6 +8,9 @@ namespace MogBot.Host
 {
     public class HostingEnvironment
     {
+        private Server _server;
+        private Role _kids;
+
         public delegate HostingEnvironment Create(DiscordClient discord);
 
         public DiscordClient Discord { get; set; }
@@ -27,20 +30,19 @@ namespace MogBot.Host
             {
                 trace.WriteLine("disabled", ConsoleColor.Yellow);
             }
+
+            _server = Discord.FindServers("Obsidian Guard").FirstOrDefault();
+            _kids = _server?.FindRoles("kids").FirstOrDefault();
         }
 
         public bool IsAdultOnly(Channel channel)
         {
-            // The channel.Server property is null so have to look up the server explicitly for now
-            Server server = Discord.FindServers("Obsidian Guard").FirstOrDefault();
-            if (server == null)
+            if (_server == null)
             {
                 return false;
             }
 
-            Role kids = server.FindRoles("kids").FirstOrDefault();
-
-            ChannelPermissionOverrides permissions = channel.GetPermissionsRule(kids);
+            ChannelPermissionOverrides permissions = channel.GetPermissionsRule(_kids);
 
             // General is a special snowflake as roles can't be denied or granted explicit permissions to read
             // so check for it explicitly and block
@@ -55,6 +57,16 @@ namespace MogBot.Host
             }
 
             return true;
+        }
+
+        public bool IsKid(User user)
+        {
+            if (_kids == null)
+            {
+                return false;
+            }
+
+            return user.HasRole(_kids);
         }
     }
 }

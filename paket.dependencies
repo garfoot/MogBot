@@ -4,6 +4,7 @@ strategy: max
 redirects: on
 
 nuget Autofac ~> 4
+nuget Discord.Net ~> 0
 nuget Discord.Net.Commands ~> 0
 nuget FeatureSwitcher ~> 1
 nuget FluentValidation ~> 6
